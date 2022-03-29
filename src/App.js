@@ -1,25 +1,42 @@
-import logo from './logo.svg';
 import './App.css';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
-function App() {
+import Dashboard from './Pages/Dashboard';
+import Goals from './Pages/Goals';
+import Insights from './Pages/Insights';
+import Login from './Pages/Login';
+import Profile from './Pages/Profile';
+import Register from './Pages/Register';
+import Transactions from './Pages/Transactions';
+import { useState } from 'react';
+
+const App = () => {
+  const [user] = useState(false);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route
+        path='/'
+        element={<Navigate to={user ? '/dashboard' : '/login'} />}
+      />
+      {user ? (
+        <>
+          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/goals' element={<Goals />} />
+          <Route path='/insights' element={<Insights />} />
+          <Route path='/transactions' element={<Transactions />} />
+          <Route path='/profile' element={<Profile />} />
+        </>
+      ) : (
+        <>
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+        </>
+      )}
+      <Route
+        path='*'
+        element={<Navigate to={user ? '/dashboard' : '/login'} />}
+      />
+    </Routes>
   );
-}
-
+};
 export default App;
