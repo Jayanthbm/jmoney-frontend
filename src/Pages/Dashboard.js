@@ -32,8 +32,8 @@ function Dashboard() {
         <div style={{ width: 170 }}>
           <h4>Compared to Last Month</h4>
           {props.percentageValue > 0 ? (
-            <Row gutter={16}>
-              <Col span={12}>
+            <Row>
+              <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                 <Statistic
                   title=''
                   value={props.percentageValue}
@@ -43,7 +43,7 @@ function Dashboard() {
                   suffix='%'
                 />
               </Col>
-              <Col span={12}>
+              <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                 <Statistic
                   title=''
                   value={props.money}
@@ -52,8 +52,8 @@ function Dashboard() {
               </Col>
             </Row>
           ) : (
-            <Row gutter={16}>
-              <Col span={12}>
+            <Row>
+              <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                 <Statistic
                   title=''
                   value={props.percentageValue}
@@ -62,7 +62,7 @@ function Dashboard() {
                   suffix='%'
                 />
               </Col>
-              <Col span={12}>
+              <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                 <Statistic
                   title=''
                   value={props.money}
@@ -88,8 +88,8 @@ function Dashboard() {
           title={`Data for the ${data?.month}- ${data?.year}`}
           subTitle={`(${data?.startDate} - ${data?.endDate})`}
         />
-        <Row gutter={16}>
-          <Col span={6}>
+        <Row>
+          <Col xs={24} sm={24} md={6} lg={6} xl={6}>
             <IncomeExpenseCards
               title='Total Income'
               total={data?.monthsTotalIncome?.total}
@@ -99,7 +99,7 @@ function Dashboard() {
               }
             />
           </Col>
-          <Col span={6}>
+          <Col xs={24} sm={24} md={6} lg={6} xl={6}>
             <IncomeExpenseCards
               title='Total Expense'
               total={data?.monthsTotalExpense?.total}
@@ -109,7 +109,7 @@ function Dashboard() {
               }
             />
           </Col>
-          <Col span={6}>
+          <Col xs={24} sm={24} md={6} lg={6} xl={6}>
             <Row gutter={16}>
               <Col span={12}>
                 <Statistic
@@ -131,7 +131,7 @@ function Dashboard() {
               suffix={'/' + data?.dailyLimit?.total}
             />
           </Col>
-          <Col span={6}>
+          <Col xs={24} sm={24} md={6} lg={6} xl={6}>
             <Statistic
               title='Available Balance'
               value={data?.availableBalance?.total}
