@@ -18,6 +18,7 @@ import { BASE_URL } from '../constants';
 import axios from 'axios';
 import { AuthContext } from '../context';
 import CustomCard from '../Components/CustomCard';
+import LogOutButton from '../Components/LogOutButton';
 function Dashboard() {
   const [data, setData] = useState();
   const { token } = useContext(AuthContext);
@@ -98,11 +99,15 @@ function Dashboard() {
         <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
       </Breadcrumb>
       <div className='site-layout-content'>
-        <PageHeader
-          className='site-page-header'
-          title={`Data for the ${data?.month}- ${data?.year}`}
-          subTitle={`(${data?.startDate} - ${data?.endDate})`}
-        />
+        <LogOutButton />
+        {data && (
+          <PageHeader
+            className='site-page-header'
+            title={`Data for ${data?.month}- ${data?.year}`}
+            subTitle={`(${data?.startDate} - ${data?.endDate})`}
+          />
+        )}
+
         <Row>
           <Col xs={24} sm={24} md={12} lg={12} xl={6}>
             <CustomCard>

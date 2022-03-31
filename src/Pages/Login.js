@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import './login.css';
-import { Form, Input, Button, notification } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { AuthContext } from '../context';
 import axios from 'axios';
 import { BASE_URL } from '../constants';
@@ -9,28 +9,28 @@ function Login() {
   const { setToken } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const openNotificationWithIcon = (type, message, description) => {
-    notification[type]({
-      message: message ? message : '',
-      description: description ? description : null,
-    });
-  };
+  const [loading, setLoading] = useState(false);
   const login = async () => {
+    message.destroy();
+    message.info({
+      content: 'Logging in.. Please wait',
+      key: 'loading',
+    });
+    setLoading(true);
     try {
       const res = await axios.post(`${BASE_URL}/auth/login`, {
         email,
         password,
       });
+      message.destroy('loading');
+      message.success(res?.data?.message, 3);
+      setLoading(false);
       setToken(res.data.token);
       localStorage.setItem('token', res.data.token);
     } catch (error) {
-      console.log(error?.response?.data?.message);
-      openNotificationWithIcon(
-        'error',
-        error?.response?.data?.type,
-        error.response.data.message
-      );
+      setLoading(false);
+      message.destroy('loading');
+      message.error(error?.response?.data?.message, 6);
     }
   };
   return (
@@ -80,6 +80,7 @@ function Login() {
               type='primary'
               htmlType='submit'
               className='login-form-button'
+              disabled={loading}
             >
               LOGIN
             </Button>

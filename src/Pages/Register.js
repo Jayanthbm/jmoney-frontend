@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './login.css';
-import { Form, Input, Button, notification } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import axios from 'axios';
 import { BASE_URL } from '../constants';
 import { Link, useNavigate } from 'react-router-dom';
@@ -10,15 +10,14 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
-
-  const openNotificationWithIcon = (type, message, description) => {
-    notification[type]({
-      message: message ? message : '',
-      description: description ? description : null,
-    });
-  };
-
+  const [loading, setLoading] = useState(false);
   const register = async () => {
+    setLoading(true);
+    message.destroy();
+    message.info({
+      content: 'Registering.. Please wait',
+      key: 'loading',
+    });
     try {
       const res = await axios.post(`${BASE_URL}/auth/register`, {
         name,
@@ -26,16 +25,14 @@ function Register() {
         password,
         phone,
       });
-      console.log(res.data);
-      openNotificationWithIcon('success', res.data.type, res.data.message);
+      setLoading(false);
+      message.destroy('loading');
+      message.success(res?.data?.message, 3);
       navigate('/login');
     } catch (error) {
-      console.log(error?.response?.data?.message);
-      openNotificationWithIcon(
-        'error',
-        error?.response?.data?.type,
-        error.response.data.message
-      );
+      setLoading(false);
+      message.destroy('loading');
+      message.error(error?.response?.data?.message, 6);
     }
   };
   return (
@@ -105,6 +102,7 @@ function Register() {
               type='primary'
               htmlType='submit'
               className='login-form-button'
+              disabled={loading}
             >
               Register
             </Button>

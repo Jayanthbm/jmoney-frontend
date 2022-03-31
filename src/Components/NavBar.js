@@ -1,15 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Layout, Menu } from 'antd';
 import { Link } from 'react-router-dom';
-import { AuthContext } from '../context';
 
 const { Header } = Layout;
 function NavBar(props) {
-  const { setToken } = useContext(AuthContext);
-  const Logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-  };
   return (
     <Header>
       <div className='logo' />
@@ -32,11 +26,6 @@ function NavBar(props) {
         </Menu.Item>
         <Menu.Item key={'profile'}>
           <Link to='/profile'>Profile</Link>
-        </Menu.Item>
-        <Menu.Item key={'logout'}>
-          <Link to='/' onClick={Logout}>
-            Logout
-          </Link>
         </Menu.Item>
       </Menu>
     </Header>
