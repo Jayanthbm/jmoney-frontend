@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Breadcrumb, Statistic, Row, Col, PageHeader } from 'antd';
+import {
+  Breadcrumb,
+  Statistic,
+  Row,
+  Col,
+  PageHeader,
+  Skeleton,
+  Divider,
+} from 'antd';
 import {
   ArrowUpOutlined,
   ArrowDownOutlined,
@@ -9,6 +17,7 @@ import NavBar from '../Components/NavBar';
 import { BASE_URL } from '../constants';
 import axios from 'axios';
 import { AuthContext } from '../context';
+import CustomCard from '../Components/CustomCard';
 function Dashboard() {
   const [data, setData] = useState();
   const { token } = useContext(AuthContext);
@@ -19,7 +28,6 @@ function Dashboard() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
       setData(response.data);
     }
     fetchData();
@@ -30,10 +38,25 @@ function Dashboard() {
       <React.Fragment>
         <Statistic title={props.title} value={props.total} />
         <div style={{ width: 170 }}>
-          <h4>Compared to Last Month</h4>
+          <Divider />
+          <span
+            style={{
+              color: '#000000',
+              opacity: 0.4,
+              fontSize: '14px',
+              marginBottom: '4px',
+            }}
+          >
+            Compared to Last Month
+          </span>
           {props.percentageValue > 0 ? (
             <Row>
-              <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+              <Col span={24}>
+                <Statistic
+                  title=''
+                  value={props.money}
+                  prefix={<MoneyCollectOutlined />}
+                />
                 <Statistic
                   title=''
                   value={props.percentageValue}
@@ -43,17 +66,15 @@ function Dashboard() {
                   suffix='%'
                 />
               </Col>
-              <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+            </Row>
+          ) : (
+            <Row>
+              <Col span={24}>
                 <Statistic
                   title=''
                   value={props.money}
                   prefix={<MoneyCollectOutlined />}
                 />
-              </Col>
-            </Row>
-          ) : (
-            <Row>
-              <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                 <Statistic
                   title=''
                   value={props.percentageValue}
@@ -62,19 +83,13 @@ function Dashboard() {
                   suffix='%'
                 />
               </Col>
-              <Col xs={24} sm={24} md={6} lg={6} xl={6}>
-                <Statistic
-                  title=''
-                  value={props.money}
-                  prefix={<MoneyCollectOutlined />}
-                />
-              </Col>
             </Row>
           )}
         </div>
       </React.Fragment>
     );
   };
+
   return (
     <React.Fragment>
       <NavBar active={'dashboard'} />
@@ -89,53 +104,70 @@ function Dashboard() {
           subTitle={`(${data?.startDate} - ${data?.endDate})`}
         />
         <Row>
-          <Col xs={24} sm={24} md={6} lg={6} xl={6}>
-            <IncomeExpenseCards
-              title='Total Income'
-              total={data?.monthsTotalIncome?.total}
-              money={data?.monthsTotalIncome?.comparedToLastMonthInMoney}
-              percentageValue={
-                data?.monthsTotalIncome?.comparedToLastMonthInPercent
-              }
-            />
-          </Col>
-          <Col xs={24} sm={24} md={6} lg={6} xl={6}>
-            <IncomeExpenseCards
-              title='Total Expense'
-              total={data?.monthsTotalExpense?.total}
-              money={data?.monthsTotalExpense?.comparedToLastMonthInMoney}
-              percentageValue={
-                data?.monthsTotalExpense?.comparedToLastMonthInPercent
-              }
-            />
-          </Col>
-          <Col xs={24} sm={24} md={6} lg={6} xl={6}>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Statistic
-                  title='Daily Limit'
-                  value={data?.dailyLimit?.total}
+          <Col xs={24} sm={24} md={12} lg={12} xl={6}>
+            <CustomCard>
+              <Skeleton loading={data ? false : true} active>
+                <IncomeExpenseCards
+                  title='Total Income'
+                  total={data?.monthsTotalIncome?.total}
+                  money={data?.monthsTotalIncome?.comparedToLastMonthInMoney}
+                  percentageValue={
+                    data?.monthsTotalIncome?.comparedToLastMonthInPercent
+                  }
                 />
-              </Col>
-              <Col span={12}>
-                <Statistic
-                  title='Spent Today'
-                  value={data?.dailyLimit?.spentToday}
-                />
-              </Col>
-            </Row>
-
-            <Statistic
-              title='Remaining'
-              value={data?.dailyLimit?.remaingForTheeDay}
-              suffix={'/' + data?.dailyLimit?.total}
-            />
+              </Skeleton>
+            </CustomCard>
           </Col>
-          <Col xs={24} sm={24} md={6} lg={6} xl={6}>
-            <Statistic
-              title='Available Balance'
-              value={data?.availableBalance?.total}
-            />
+          <Col xs={24} sm={24} md={12} lg={12} xl={6}>
+            <CustomCard>
+              <Skeleton loading={data ? false : true} active>
+                <IncomeExpenseCards
+                  title='Total Expense'
+                  total={data?.monthsTotalExpense?.total}
+                  money={data?.monthsTotalExpense?.comparedToLastMonthInMoney}
+                  percentageValue={
+                    data?.monthsTotalExpense?.comparedToLastMonthInPercent
+                  }
+                />
+              </Skeleton>
+            </CustomCard>
+          </Col>
+          <Col xs={24} sm={24} md={12} lg={12} xl={6}>
+            <CustomCard>
+              <Skeleton loading={data ? false : true} active>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Statistic
+                      title='Daily Limit'
+                      value={data?.dailyLimit?.total}
+                    />
+                  </Col>
+                  <Col span={12}>
+                    <Statistic
+                      title='Spent Today'
+                      value={data?.dailyLimit?.spentToday}
+                    />
+                  </Col>
+                </Row>
+                <Divider />
+                <Statistic
+                  title='Remaining'
+                  value={data?.dailyLimit?.remaingForTheeDay}
+                  suffix={'/' + data?.dailyLimit?.total}
+                />
+              </Skeleton>
+            </CustomCard>
+          </Col>
+          <Col xs={24} sm={24} md={12} lg={12} xl={6}>
+            <CustomCard>
+              <Skeleton loading={data ? false : true} active>
+                <Statistic
+                  title='Available Balance'
+                  value={data?.availableBalance?.total}
+                />
+                <Divider />
+              </Skeleton>
+            </CustomCard>
           </Col>
         </Row>
       </div>
