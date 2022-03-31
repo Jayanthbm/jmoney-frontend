@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Breadcrumb, Statistic, Row, Col, Progress, PageHeader } from 'antd';
+import { Breadcrumb, Statistic, Row, Col, PageHeader } from 'antd';
 import {
   ArrowUpOutlined,
   ArrowDownOutlined,
