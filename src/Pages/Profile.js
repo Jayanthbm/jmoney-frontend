@@ -179,7 +179,22 @@ function Profile() {
                     </Button>
                   </Divider>
                   <Divider orientation='left'>Expense Categories</Divider>
-                  {data?.expenseCategories?.length > 0 ? <></> : <Empty />}
+                  {data?.expenseCategories?.length > 0 ? (
+                    <React.Fragment>
+                      {data?.expenseCategories?.map((item) => {
+                        return (
+                          <CategoryItem
+                            key={item?.id}
+                            id={item?.id}
+                            type={item?.type[0]}
+                            name={item?.name}
+                          />
+                        );
+                      })}
+                    </React.Fragment>
+                  ) : (
+                    <Empty />
+                  )}
                 </Skeleton>
               </CustomCard>
             </Col>
