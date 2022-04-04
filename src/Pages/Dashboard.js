@@ -7,6 +7,7 @@ import {
   PageHeader,
   Skeleton,
   Divider,
+  message,
 } from 'antd';
 import {
   ArrowUpOutlined,
@@ -21,8 +22,13 @@ import CustomCard from '../Components/CustomCard';
 import LogOutButton from '../Components/LogOutButton';
 function Dashboard() {
   const [data, setData] = useState();
+  const [loading, setLoading] = useState(true);
   const { token } = useContext(AuthContext);
   useEffect(() => {
+    message.info({
+      content: 'loading data..',
+      key: 'loading',
+    });
     async function fetchData() {
       const response = await axios.get(`${BASE_URL}/money/dashboard`, {
         headers: {
@@ -30,6 +36,7 @@ function Dashboard() {
         },
       });
       setData(response.data);
+      setLoading(false);
     }
     fetchData();
   }, [token]);
@@ -91,6 +98,14 @@ function Dashboard() {
     );
   };
 
+  useEffect(() => {
+    function removeMessage() {
+      message.destroy('loading');
+    }
+    if (loading === false) {
+      removeMessage();
+    }
+  }, [loading]);
   return (
     <React.Fragment>
       <NavBar active={'dashboard'} />

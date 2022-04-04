@@ -27,6 +27,10 @@ function Goals() {
   const { token } = useContext(AuthContext);
 
   useEffect(() => {
+    message.info({
+      content: 'loading data..',
+      key: 'loading',
+    });
     async function fetchData() {
       const response = await axios.get(`${BASE_URL}/money/user-goals`, {
         headers: {
@@ -78,6 +82,7 @@ function Goals() {
       message.error(error?.response?.data?.message, 3);
     }
   };
+
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [goalId, setGoalId] = useState(null);
   const [goalName, setGoalName] = useState('');
@@ -155,6 +160,15 @@ function Goals() {
       message.error(error?.response?.data?.message, 3);
     }
   };
+
+  useEffect(() => {
+    function removeMessage() {
+      message.destroy('loading');
+    }
+    if (loading === false) {
+      removeMessage();
+    }
+  }, [loading]);
 
   return (
     <React.Fragment>
