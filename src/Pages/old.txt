@@ -1,0 +1,39 @@
+
+              <Select
+                defaultValue='0'
+                style={{ width: 120 }}
+                onChange={(value) => setCategoryId(value)}
+              >
+                <Option value='0'>All Categories</Option>
+                {transactionType === 'income'
+                  ? incomeCategories.map((category) => (
+                      <Option value={category.id}>{category.name}</Option>
+                    ))
+                  : transactionType === 'expense'
+                  ? expenseCategories.map((category) => (
+                      <Option value={category.id}>{category.name}</Option>
+                    ))
+                  : categories.map((category) => (
+                      <Option value={category.id}>{category.name}</Option>
+                    ))}
+              </Select>
+              <Select
+                defaultValue='0'
+                style={{ width: 120 }}
+                onChange={(value) => setMonth(value)}
+              >
+                <Option value='0'>All Months</Option>
+                {[...Array(12).keys()].map((month) => (
+                  <Option value={month + 1}>{monthNames[month]}</Option>
+                ))}
+              </Select>
+              <Select
+                defaultValue='0'
+                style={{ width: 120 }}
+                onChange={(value) => setYear(value)}
+              >
+                <Option value='0'>Any Year</Option>
+                <Option value='2022'>2022</Option>
+                <Option value='2021'>2021</Option>
+                <Option value='2020'>2020</Option>
+              </Select>

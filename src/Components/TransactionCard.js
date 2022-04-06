@@ -10,7 +10,11 @@ import {
   Popconfirm,
   Button,
 } from 'antd';
-import { DollarCircleFilled } from '@ant-design/icons';
+import {
+  DollarCircleFilled,
+  EditOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
 const moment = require('moment');
 function TransactionCard(props) {
   return (
@@ -61,7 +65,7 @@ function TransactionCard(props) {
                   title='Are you sure to delete?'
                   onConfirm={props.onDelete}
                 >
-                  <Button type='primary' danger>
+                  <Button type='primary' danger icon={<DeleteOutlined />}>
                     Delete
                   </Button>
                 </Popconfirm>
@@ -79,6 +83,7 @@ function TransactionCard(props) {
                         : '#ff9966',
                   }}
                   onClick={props.onEdit}
+                  icon={<EditOutlined />}
                 >
                   Edit
                 </Button>

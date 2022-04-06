@@ -12,7 +12,13 @@ import {
   message,
   Popconfirm,
   Modal,
+  Input,
 } from 'antd';
+import {
+  AppstoreAddOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from '@ant-design/icons';
 import NavBar from '../Components/NavBar';
 import LogOutButton from '../Components/LogOutButton';
 import GoalForm from '../Components/GoalForm';
@@ -20,28 +26,33 @@ import { AuthContext } from '../context';
 import { BASE_URL } from '../constants';
 import axios from 'axios';
 import CustomCard from '../Components/CustomCard';
+const { Search } = Input;
 function Goals() {
   const [userGoals, setUserGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
   const { token } = useContext(AuthContext);
-
+  const [search, setSearch] = useState('');
   useEffect(() => {
     message.info({
       content: 'loading data..',
       key: 'loading',
     });
     async function fetchData() {
-      const response = await axios.get(`${BASE_URL}/money/user-goals`, {
+      let url = `${BASE_URL}/money/user-goals`;
+      if (search?.length > 0) {
+        url += `?search=${search}`;
+      }
+      const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response);
       setUserGoals(response.data);
       setLoading(false);
     }
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, reload]);
 
   const getStrokeColor = (percentage) => {
@@ -189,10 +200,29 @@ function Goals() {
               setSavedAmount(0);
               setGoalType('Add');
             }}
+            icon={<AppstoreAddOutlined />}
           >
             Add New Goal
           </Button>
         </LogOutButton>
+        <div style={{ marginTop: 10, marginBottom: 5, marginLeft: 10 }}>
+          <Row>
+            <Col>
+              <Search
+                placeholder='Search Goals'
+                enterButton='Search'
+                size='large'
+                loading={loading}
+                allowClear={true}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onSearch={() => setReload(!reload)}
+                onPressEnter={() => setReload(!reload)}
+              />
+            </Col>
+          </Row>
+        </div>
+
         {loading ? (
           <Skeleton loading active />
         ) : (
@@ -267,6 +297,7 @@ function Goals() {
                               danger
                               style={{ margin: 2 }}
                               onClick={() => true}
+                              icon={<DeleteOutlined />}
                             >
                               Delete
                             </Button>
@@ -283,6 +314,7 @@ function Goals() {
                               setGoalAmount(goal.totalAmount);
                               setSavedAmount(goal.savedAmount);
                             }}
+                            icon={<EditOutlined />}
                           >
                             Edit
                           </Button>

@@ -7,7 +7,13 @@ import {
   message,
   Select,
   Modal,
+  Row,
+  Col,
+  Input,
+  Radio,
+  Divider,
 } from 'antd';
+import { FolderAddFilled } from '@ant-design/icons';
 import NavBar from '../Components/NavBar';
 import LogOutButton from '../Components/LogOutButton';
 import { AuthContext } from '../context';
@@ -17,6 +23,7 @@ import TransactionCard from '../Components/TransactionCard';
 import TransactionForm from '../Components/TransactionForm';
 import moment from 'moment';
 const { Option } = Select;
+const { Search } = Input;
 function Transactions() {
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
@@ -47,6 +54,9 @@ function Transactions() {
       if (month > 0) {
         url += `&month=${month}`;
       }
+      if (search?.length > 0) {
+        url += `&search=${search}`;
+      }
 
       const response = await axios.get(url, {
         headers: {
@@ -62,6 +72,7 @@ function Transactions() {
       setLoading(false);
     }
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, transactionType, categoryId, year, month, reload]);
 
   const [categories, setCategories] = useState([]);
@@ -161,6 +172,7 @@ function Transactions() {
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [transactionDate, setTransactionDate] = useState(new Date());
 
+  const [search, setSearch] = useState('');
   const addTransaction = async () => {
     message.info({
       content: 'Adding Transaction.. please wait',
@@ -271,6 +283,12 @@ function Transactions() {
     setTransactionDate(`${selectedDate} ${timeString}`);
   }
 
+  const options = [
+    { label: 'All', value: 'all' },
+    { label: 'Income', value: 'income' },
+    { label: 'Expense', value: 'expense' },
+  ];
+
   return (
     <React.Fragment>
       <NavBar active={'transactions'} />
@@ -298,6 +316,7 @@ function Transactions() {
               setNewTransactionType('income');
               setNewCategoryId(0);
             }}
+            icon={<FolderAddFilled />}
           >
             Add Income
           </Button>
@@ -318,6 +337,7 @@ function Transactions() {
               setNewTransactionType('expense');
             }}
             disabled={loading}
+            icon={<FolderAddFilled />}
           >
             Add Expense
           </Button>
@@ -326,59 +346,96 @@ function Transactions() {
           <Skeleton active />
         ) : (
           <React.Fragment>
-            <br />
-            <React.Fragment>
-              <Select
-                defaultValue='all'
-                style={{ width: 120 }}
-                onChange={(value) => setTransactionType(value)}
-              >
-                <Option value='all'>Income/Expense</Option>
-                <Option value='income'>Income</Option>
-                <Option value='expense'>Expense</Option>
-              </Select>
-              <Select
-                defaultValue='0'
-                style={{ width: 120 }}
-                onChange={(value) => setCategoryId(value)}
-              >
-                <Option value='0'>All Categories</Option>
-                {transactionType === 'income'
-                  ? incomeCategories.map((category) => (
-                      <Option value={category.id}>{category.name}</Option>
-                    ))
-                  : transactionType === 'expense'
-                  ? expenseCategories.map((category) => (
-                      <Option value={category.id}>{category.name}</Option>
-                    ))
-                  : categories.map((category) => (
-                      <Option value={category.id}>{category.name}</Option>
-                    ))}
-              </Select>
-              <Select
-                defaultValue='0'
-                style={{ width: 120 }}
-                onChange={(value) => setMonth(value)}
-              >
-                <Option value='0'>All Months</Option>
-                {[...Array(12).keys()].map((month) => (
-                  <Option value={month + 1}>{monthNames[month]}</Option>
-                ))}
-              </Select>
-              <Select
-                defaultValue='0'
-                style={{ width: 120 }}
-                onChange={(value) => setYear(value)}
-              >
-                <Option value='0'>Any Year</Option>
-                <Option value='2022'>2022</Option>
-                <Option value='2021'>2021</Option>
-                <Option value='2020'>2020</Option>
-              </Select>
-            </React.Fragment>
-
+            <Row>
+              <Col xs={24} sm={10} md={8} lg={8} xl={8}>
+                <div style={{ marginTop: 10, marginBottom: 5, marginLeft: 10 }}>
+                  <Row>
+                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                      <Divider plain>Search</Divider>
+                    </Col>
+                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                      <Search
+                        placeholder='Search Descriptions'
+                        enterButton='Search'
+                        size='large'
+                        loading={loading}
+                        allowClear={true}
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onSearch={() => setReload(!reload)}
+                        onPressEnter={() => setReload(!reload)}
+                      />
+                    </Col>
+                  </Row>
+                </div>
+              </Col>
+              <Col xs={24} sm={12} md={9} lg={7} xl={5}>
+                <div style={{ marginTop: 10, marginBottom: 5, marginLeft: 10 }}>
+                  <Row>
+                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                      <Divider plain>Type</Divider>
+                    </Col>
+                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                      <Radio.Group
+                        defaultValue={transactionType}
+                        options={options}
+                        onChange={(e) => setTransactionType(e.target.value)}
+                        value={transactionType}
+                        optionType='button'
+                        buttonStyle='solid'
+                        size='large'
+                      />
+                    </Col>
+                  </Row>
+                </div>
+              </Col>
+              <Col xs={24} sm={12} md={7} lg={9} xl={11}>
+                <div
+                  style={{
+                    marginTop: 10,
+                    marginBottom: 5,
+                    marginLeft: 10,
+                    display: 'flex',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Row>
+                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                      <Divider plain>Category</Divider>
+                    </Col>
+                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                      <Select
+                        defaultValue='0'
+                        onChange={(value) => setCategoryId(value)}
+                        size='large'
+                      >
+                        <Option value='0'>All Categories</Option>
+                        {transactionType === 'income'
+                          ? incomeCategories.map((category) => (
+                              <Option value={category.id} key={category.id}>
+                                {category.name}
+                              </Option>
+                            ))
+                          : transactionType === 'expense'
+                          ? expenseCategories.map((category) => (
+                              <Option value={category.id} key={category.id}>
+                                {category.name}
+                              </Option>
+                            ))
+                          : categories.map((category) => (
+                              <Option value={category.id} key={category.id}>
+                                {category.name}
+                              </Option>
+                            ))}
+                      </Select>
+                    </Col>
+                  </Row>
+                </div>
+              </Col>
+            </Row>
             {transactions?.length > 0 ? (
               <React.Fragment>
+                <p>Transactions for the month {monthNames[month]}</p>
                 {transactions.map((transaction) => (
                   <TransactionCard
                     key={transaction.id}
@@ -414,8 +471,10 @@ function Transactions() {
                       marginLeft: 3,
                       background: '#52c41a',
                       borderColor: '#52c41a',
-                      alignSelf: 'center',
+                      display: 'block',
+                      margin: '0 auto',
                     }}
+                    size='large'
                     onClick={() => {
                       setPage(page + 1);
                     }}
