@@ -33,8 +33,8 @@ function Transactions() {
   const [showLoadMore, setShowLoadMore] = useState(true);
   const [transactionType, setTransactionType] = useState('all');
   const [categoryId, setCategoryId] = useState(0);
-  const [year, setYear] = useState(0);
-  const [month, setMonth] = useState(0);
+  const [year, setYear] = useState(moment().format('YYYY'));
+  const [month, setMonth] = useState(moment().format('M'));
   useEffect(() => {
     message.info({
       content: 'loading data..',
@@ -145,6 +145,7 @@ function Transactions() {
   }, [page, token]);
 
   const monthNames = [
+    '',
     'January',
     'February',
     'March',
@@ -435,7 +436,9 @@ function Transactions() {
             </Row>
             {transactions?.length > 0 ? (
               <React.Fragment>
-                <p>Transactions for the month {monthNames[month]}</p>
+                <p>
+                  Transactions for the month {monthNames[month - 1]}, {year}
+                </p>
                 {transactions.map((transaction) => (
                   <TransactionCard
                     key={transaction.id}
