@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import {
-  Breadcrumb,
   Statistic,
   Row,
   Col,
@@ -20,6 +19,7 @@ import axios from 'axios';
 import { AuthContext } from '../context';
 import CustomCard from '../Components/CustomCard';
 import LogOutButton from '../Components/LogOutButton';
+import CustomBreadcrumb from '../Components/CustomBreadcrumb';
 function Dashboard() {
   const [data, setData] = useState();
   const [loading, setLoading] = useState(true);
@@ -109,10 +109,7 @@ function Dashboard() {
   return (
     <React.Fragment>
       <NavBar active={'dashboard'} />
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
-      </Breadcrumb>
+      <CustomBreadcrumb title={'Dashboard'} />
       <div className='site-layout-content'>
         <LogOutButton />
         {data && (

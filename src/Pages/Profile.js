@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import {
-  Breadcrumb,
   Divider,
   Skeleton,
   Row,
@@ -22,6 +21,7 @@ import axios from 'axios';
 import { AuthContext } from '../context';
 import CustomCard from '../Components/CustomCard';
 import LogOutButton from '../Components/LogOutButton';
+import CustomBreadcrumb from '../Components/CustomBreadcrumb';
 function Profile() {
   const [data, setData] = useState(null);
   const [reload, setReload] = useState(false);
@@ -136,10 +136,7 @@ function Profile() {
   return (
     <React.Fragment>
       <NavBar active={'profile'} />
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>Profile</Breadcrumb.Item>
-      </Breadcrumb>
+      <CustomBreadcrumb title={'Profile'} />
       <div className='site-layout-content'>
         <LogOutButton />
         <React.Fragment>

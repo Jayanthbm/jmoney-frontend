@@ -9,6 +9,7 @@ import {
   Badge,
   Popconfirm,
   Button,
+  Typography,
 } from 'antd';
 import {
   DollarCircleFilled,
@@ -16,6 +17,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 const moment = require('moment');
+const { Text } = Typography;
 function TransactionCard(props) {
   return (
     <Badge.Ribbon
@@ -35,20 +37,31 @@ function TransactionCard(props) {
               {moment(props.transaction.date).format('DD-MM-YYYY')}
             </Divider>
             <Col xs={24} sm={12} md={8} lg={8} xl={8}>
-              <Statistic
-                title='Amount'
-                value={props.transaction.amount}
-                prefix={
-                  <DollarCircleFilled
-                    style={{
-                      color:
-                        props.transaction?.type[0] === 'income'
-                          ? '#52c41a'
-                          : '#f5222d',
-                    }}
+              <Row>
+                <Col span={24}>
+                  <Statistic
+                    title='Amount'
+                    value={props.transaction.amount}
+                    prefix={
+                      <DollarCircleFilled
+                        style={{
+                          color:
+                            props.transaction?.type[0] === 'income'
+                              ? '#52c41a'
+                              : '#f5222d',
+                        }}
+                      />
+                    }
                   />
-                }
-              />
+                </Col>
+                <Col span={24}>
+                  <div style={{ marginRight: 10, marginTop: 5 }}>
+                    <Text code ellipsis={true}>
+                      {props.transaction?.description}
+                    </Text>
+                  </div>
+                </Col>
+              </Row>
             </Col>
             <Col xs={24} sm={12} md={8} lg={8} xl={8}>
               <Divider orientation='left' plain>

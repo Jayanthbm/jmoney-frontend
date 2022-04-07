@@ -1,15 +1,12 @@
 import React from 'react';
-import { Breadcrumb } from 'antd';
 import NavBar from '../Components/NavBar';
 import LogOutButton from '../Components/LogOutButton';
+import CustomBreadcrumb from '../Components/CustomBreadcrumb';
 function Insights() {
   return (
     <React.Fragment>
       <NavBar active={'insights'} />
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>Insights</Breadcrumb.Item>
-      </Breadcrumb>
+      <CustomBreadcrumb title={'Insights'} />
       <div className='site-layout-content'>
         <LogOutButton />
       </div>

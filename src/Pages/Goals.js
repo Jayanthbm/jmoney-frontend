@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import {
-  Breadcrumb,
   Skeleton,
   Empty,
   Row,
@@ -26,6 +25,8 @@ import { AuthContext } from '../context';
 import { BASE_URL } from '../constants';
 import axios from 'axios';
 import CustomCard from '../Components/CustomCard';
+import CustomBreadcrumb from '../Components/CustomBreadcrumb';
+
 const { Search } = Input;
 function Goals() {
   const [userGoals, setUserGoals] = useState([]);
@@ -184,10 +185,7 @@ function Goals() {
   return (
     <React.Fragment>
       <NavBar active={'goals'} />
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>Goals</Breadcrumb.Item>
-      </Breadcrumb>
+      <CustomBreadcrumb title={'Goals'} />
       <div className='site-layout-content'>
         <LogOutButton>
           <Button

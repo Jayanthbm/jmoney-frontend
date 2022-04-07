@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import {
-  Breadcrumb,
   Skeleton,
   Empty,
   Button,
@@ -12,7 +11,9 @@ import {
   Input,
   Radio,
   Divider,
+  Cascader,
 } from 'antd';
+import { Link } from 'react-router-dom';
 import { FolderAddFilled } from '@ant-design/icons';
 import NavBar from '../Components/NavBar';
 import LogOutButton from '../Components/LogOutButton';
@@ -21,6 +22,7 @@ import { BASE_URL } from '../constants';
 import axios from 'axios';
 import TransactionCard from '../Components/TransactionCard';
 import TransactionForm from '../Components/TransactionForm';
+import CustomBreadcrumb from '../Components/CustomBreadcrumb';
 import moment from 'moment';
 const { Option } = Select;
 const { Search } = Input;
@@ -35,6 +37,7 @@ function Transactions() {
   const [categoryId, setCategoryId] = useState(0);
   const [year, setYear] = useState(moment().format('YYYY'));
   const [month, setMonth] = useState(moment().format('M'));
+
   useEffect(() => {
     message.info({
       content: 'loading data..',
@@ -290,13 +293,84 @@ function Transactions() {
     { label: 'Expense', value: 'expense' },
   ];
 
+  const children = [
+    {
+      value: '1',
+      label: 'January',
+    },
+    {
+      value: '2',
+      label: 'February',
+    },
+    {
+      value: '3',
+      label: 'March',
+    },
+    {
+      value: '4',
+      label: 'April',
+    },
+    {
+      value: '5',
+      label: 'May',
+    },
+    {
+      value: '6',
+      label: 'June',
+    },
+    {
+      value: '7',
+      label: 'July',
+    },
+    {
+      value: '8',
+      label: 'August',
+    },
+    {
+      value: '9',
+      label: 'September',
+    },
+    {
+      value: '10',
+      label: 'October',
+    },
+    {
+      value: '11',
+      label: 'November',
+    },
+    {
+      value: '12',
+      label: 'December',
+    },
+  ];
+
+  const casscaderOptions = [
+    {
+      label: '2022',
+      value: '2022',
+      children,
+    },
+    {
+      label: '2021',
+      value: '2021',
+      children,
+    },
+    {
+      label: '2020',
+      value: '2020',
+      children,
+    },
+  ];
+  const cascaderonChange = (value, selectedOptions) => {
+    setYear(value[0]);
+    setMonth(value[1]);
+    return true;
+  };
+
   return (
     <React.Fragment>
       <NavBar active={'transactions'} />
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>Transactions</Breadcrumb.Item>
-      </Breadcrumb>
+      <CustomBreadcrumb title={'Transactions'} />
       <div className='site-layout-content'>
         <LogOutButton>
           <Button
@@ -434,11 +508,20 @@ function Transactions() {
                 </div>
               </Col>
             </Row>
+            <Divider orientation='left'>
+              Transactions for the Month : {monthNames[month]} {year} (
+              {casscaderOptions && (
+                <Cascader
+                  options={casscaderOptions?.length > 0 ? casscaderOptions : []}
+                  onChange={cascaderonChange}
+                >
+                  <Link to='#'>Change</Link>
+                </Cascader>
+              )}
+              )
+            </Divider>
             {transactions?.length > 0 ? (
               <React.Fragment>
-                <p>
-                  Transactions for the month {monthNames[month - 1]}, {year}
-                </p>
                 {transactions.map((transaction) => (
                   <TransactionCard
                     key={transaction.id}
@@ -457,7 +540,12 @@ function Transactions() {
                       );
                       setTransactionId(transaction.id);
                       setNewTransactionType(transaction.type[0]);
-                      setNewCategoryId(transaction?.category?.id);
+                      if (transaction.category) {
+                        setNewCategoryId(transaction?.category.id);
+                      } else {
+                        setNewCategoryId(0);
+                      }
+
                       setType('Edit');
                     }}
                     onDelete={() => {

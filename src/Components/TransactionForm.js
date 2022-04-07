@@ -5,6 +5,7 @@ const { Option } = Select;
 function TransactionForm(props) {
   const dateFormat = 'YYYY-MM-DD';
   const timeFormat = 'HH:mm:ss';
+
   return (
     <React.Fragment>
       <Form.Item label='Amount' style={{ display: 'block' }}>
