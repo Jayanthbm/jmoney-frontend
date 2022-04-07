@@ -37,3 +37,11 @@
                 <Option value='2021'>2021</Option>
                 <Option value='2020'>2020</Option>
               </Select>
+
+Old Line Numbes
+
+Dashboard -196
+Goals - 359
+Insights -18
+Profile -258
+Transactions -626
