@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import './login.css';
-import { Form, Input, Button, message } from 'antd';
-import axios from 'axios';
-import { BASE_URL } from '../constants';
+import { Form, Input, Button } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
+import { registerUser } from '../network/lib/auth';
 function Register() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
@@ -11,30 +10,7 @@ function Register() {
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
-  const register = async () => {
-    setLoading(true);
-    message.destroy();
-    message.info({
-      content: 'Registering.. Please wait',
-      key: 'loading',
-    });
-    try {
-      const res = await axios.post(`${BASE_URL}/auth/register`, {
-        name,
-        email,
-        password,
-        phone,
-      });
-      setLoading(false);
-      message.destroy('loading');
-      message.success(res?.data?.message, 3);
-      navigate('/login');
-    } catch (error) {
-      setLoading(false);
-      message.destroy('loading');
-      message.error(error?.response?.data?.message, 6);
-    }
-  };
+
   return (
     <div className='login-page'>
       <div className='login-box'>
@@ -46,7 +22,17 @@ function Register() {
         </div>
         <Form
           name='login-form'
-          onFinish={register}
+          onFinish={() => {
+            setLoading(true);
+            registerUser({
+              name,
+              email,
+              password,
+              phone,
+            })
+              .then(() => navigate('/login'))
+              .finally(() => setLoading(false));
+          }}
           onFinishFailed={() => {
             console.log('failed');
           }}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Skeleton,
   Empty,
@@ -8,7 +8,6 @@ import {
   Statistic,
   Progress,
   Button,
-  message,
   Popconfirm,
   Modal,
   Input,
@@ -21,40 +20,22 @@ import {
 import NavBar from '../Components/NavBar';
 import LogOutButton from '../Components/LogOutButton';
 import GoalForm from '../Components/GoalForm';
-import { AuthContext } from '../context';
-import { BASE_URL } from '../constants';
-import axios from 'axios';
 import CustomCard from '../Components/CustomCard';
 import CustomBreadcrumb from '../Components/CustomBreadcrumb';
-
+import { getGoals, addGoal, editGoal, deleteGoal } from '../network/lib/goals';
 const { Search } = Input;
 function Goals() {
   const [userGoals, setUserGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
-  const { token } = useContext(AuthContext);
   const [search, setSearch] = useState('');
+
   useEffect(() => {
-    message.info({
-      content: 'loading data..',
-      key: 'loading',
-    });
-    async function fetchData() {
-      let url = `${BASE_URL}/money/user-goals`;
-      if (search?.length > 0) {
-        url += `?search=${search}`;
-      }
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setUserGoals(response.data);
-      setLoading(false);
-    }
-    fetchData();
+    getGoals(search)
+      .then((response) => setUserGoals(response.data))
+      .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, reload]);
+  }, [reload]);
 
   const getStrokeColor = (percentage) => {
     if (percentage >= 100) {
@@ -72,29 +53,6 @@ function Goals() {
     }
   };
 
-  const deleteGoal = async (id) => {
-    message.warning({
-      content: 'Deleting Goal.. please wait',
-      key: 'loading',
-    });
-    try {
-      const res = await axios.delete(`${BASE_URL}/money/deleteUserGoal/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setReload(!reload);
-
-      setLoading(false);
-      message.destroy('loading');
-      message.success(res?.data?.message, 3);
-    } catch (error) {
-      setLoading(false);
-      message.destroy('loading');
-      message.error(error?.response?.data?.message, 3);
-    }
-  };
-
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [goalId, setGoalId] = useState(null);
   const [goalName, setGoalName] = useState('');
@@ -102,85 +60,6 @@ function Goals() {
   const [savedAmount, setSavedAmount] = useState(0);
   const [goalType, setGoalType] = useState('Add');
   const [goalModal, setGoalModal] = useState(false);
-
-  const addGoal = async () => {
-    message.info({
-      content: 'Adding Goal.. please wait',
-      key: 'loading',
-    });
-    try {
-      setConfirmLoading(true);
-      const res = await axios.post(
-        `${BASE_URL}/money/addUserGoal`,
-        {
-          name: goalName,
-          totalAmount: parseFloat(goalAmount),
-          savedAmount: parseFloat(savedAmount),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setConfirmLoading(false);
-      setGoalModal(false);
-      setReload(!reload);
-      setLoading(false);
-      message.destroy('loading');
-      message.success(res?.data?.message, 3);
-    } catch (error) {
-      setConfirmLoading(false);
-      setGoalModal(false);
-      setLoading(false);
-      message.destroy('loading');
-      message.error(error?.response?.data?.message, 3);
-    }
-  };
-
-  const updateGoal = async () => {
-    message.info({
-      content: 'Updating Goal.. please wait',
-      key: 'loading',
-    });
-    try {
-      setConfirmLoading(true);
-      const res = await axios.put(
-        `${BASE_URL}/money/updateUserGoal/${goalId}`,
-        {
-          name: goalName,
-          totalAmount: parseFloat(goalAmount),
-          savedAmount: parseFloat(savedAmount),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setConfirmLoading(false);
-      setGoalModal(false);
-      setReload(!reload);
-      setLoading(false);
-      message.destroy('loading');
-      message.success(res?.data?.message, 3);
-    } catch (error) {
-      setConfirmLoading(false);
-      setGoalModal(false);
-      setLoading(false);
-      message.destroy('loading');
-      message.error(error?.response?.data?.message, 3);
-    }
-  };
-
-  useEffect(() => {
-    function removeMessage() {
-      message.destroy('loading');
-    }
-    if (loading === false) {
-      removeMessage();
-    }
-  }, [loading]);
 
   return (
     <React.Fragment>
@@ -226,102 +105,104 @@ function Goals() {
         ) : (
           <React.Fragment>
             {userGoals?.length > 0 ? (
-              <React.Fragment>
-                <Row>
-                  {userGoals.map((goal) => (
-                    <Col xs={24} sm={24} md={12} lg={8} xl={8}>
-                      <CustomCard key={goal.id}>
-                        <Divider orientation='left'>{goal.name}</Divider>
-                        <Row>
-                          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
-                            <Statistic
-                              title='Total Amount'
-                              value={goal.totalAmount}
-                              prefix={'₹'}
-                            />
-                          </Col>
-                          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
-                            <Statistic
-                              title='Pending Amount'
-                              value={goal.pendingAmount}
-                              prefix={'₹'}
-                            />
-                          </Col>
-                        </Row>
-                        <Progress
-                          percent={goal.percentageCompleted}
-                          size='small'
-                          showInfo={false}
-                          strokeColor={getStrokeColor(goal.percentageCompleted)}
-                        />
-                        <Row>
-                          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
-                            <Statistic
-                              title='Saved Amount'
-                              value={goal.savedAmount}
-                              prefix={'₹'}
-                            />
-                          </Col>
-                          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
-                            <Statistic
-                              title='Progress'
-                              value={goal.percentageCompleted}
-                              valueStyle={{
-                                color: getStrokeColor(goal.percentageCompleted),
-                              }}
-                              suffix='%'
-                            />
-                          </Col>
-                        </Row>
-                        <Divider />
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row-reverse',
-                          }}
-                        >
-                          <Popconfirm
-                            title={'Are you sure you want to delete this goal?'}
-                            onConfirm={() => {
-                              setLoading(true);
-                              deleteGoal(goal.id);
+              <Row>
+                {userGoals.map((goal) => (
+                  <Col xs={24} sm={24} md={12} lg={8} xl={8}>
+                    <CustomCard key={goal.id}>
+                      <Divider orientation='left'>{goal.name}</Divider>
+                      <Row>
+                        <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+                          <Statistic
+                            title='Total Amount'
+                            value={goal.totalAmount}
+                            prefix={'₹'}
+                          />
+                        </Col>
+                        <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+                          <Statistic
+                            title='Pending Amount'
+                            value={goal.pendingAmount}
+                            prefix={'₹'}
+                          />
+                        </Col>
+                      </Row>
+                      <Progress
+                        percent={goal.percentageCompleted}
+                        size='small'
+                        showInfo={false}
+                        strokeColor={getStrokeColor(goal.percentageCompleted)}
+                      />
+                      <Row>
+                        <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+                          <Statistic
+                            title='Saved Amount'
+                            value={goal.savedAmount}
+                            prefix={'₹'}
+                          />
+                        </Col>
+                        <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+                          <Statistic
+                            title='Progress'
+                            value={goal.percentageCompleted}
+                            valueStyle={{
+                              color: getStrokeColor(goal.percentageCompleted),
                             }}
-                            onCancel={() => true}
-                            okText='Delete'
-                            cancelText='Cancel'
-                          >
-                            <Button
-                              type='primary'
-                              danger
-                              style={{ margin: 2 }}
-                              onClick={() => true}
-                              icon={<DeleteOutlined />}
-                            >
-                              Delete
-                            </Button>
-                          </Popconfirm>
-
+                            suffix='%'
+                          />
+                        </Col>
+                      </Row>
+                      <Divider />
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row-reverse',
+                        }}
+                      >
+                        <Popconfirm
+                          title={'Are you sure you want to delete this goal?'}
+                          onConfirm={() => {
+                            setLoading(true);
+                            deleteGoal(goal.id).finally(function () {
+                              setReload(!reload);
+                              setLoading(false);
+                            });
+                          }}
+                          onCancel={() => true}
+                          okText='Delete'
+                        >
                           <Button
                             type='primary'
+                            danger
+                            size='small'
                             style={{ margin: 2 }}
-                            onClick={() => {
-                              setGoalModal(true);
-                              setGoalType('Edit');
-                              setGoalId(goal.id);
-                              setGoalName(goal.name);
-                              setGoalAmount(goal.totalAmount);
-                              setSavedAmount(goal.savedAmount);
-                            }}
-                            icon={<EditOutlined />}
+                            onClick={() => true}
+                            icon={<DeleteOutlined />}
                           >
-                            Edit
+                            Delete
                           </Button>
-                        </div>
-                      </CustomCard>
-                    </Col>
-                  ))}
-                </Row>
-              </React.Fragment>
+                        </Popconfirm>
+
+                        <Button
+                          type='primary'
+                          style={{ margin: 2 }}
+                          size='small'
+                          onClick={() => {
+                            setGoalModal(true);
+                            setGoalType('Edit');
+                            setGoalId(goal.id);
+                            setGoalName(goal.name);
+                            setGoalAmount(goal.totalAmount);
+                            setSavedAmount(goal.savedAmount);
+                          }}
+                          icon={<EditOutlined />}
+                        >
+                          Edit
+                        </Button>
+                      </div>
+                    </CustomCard>
+                  </Col>
+                ))}
+              </Row>
             ) : (
               <Empty />
             )}
@@ -333,10 +214,26 @@ function Goals() {
         visible={goalModal}
         onOk={async () => {
           if (goalType === 'Add') {
-            await addGoal();
+            addGoal({
+              name: goalName,
+              totalAmount: parseFloat(goalAmount),
+              savedAmount: parseFloat(savedAmount),
+            }).finally(function () {
+              setConfirmLoading(false);
+              setGoalModal(false);
+              setReload(!reload);
+            });
           }
           if (goalType === 'Edit') {
-            await updateGoal();
+            editGoal(goalId, {
+              name: goalName,
+              totalAmount: parseFloat(goalAmount),
+              savedAmount: parseFloat(savedAmount),
+            }).finally(function () {
+              setConfirmLoading(false);
+              setGoalModal(false);
+              setReload(!reload);
+            });
           }
         }}
         confirmLoading={confirmLoading}

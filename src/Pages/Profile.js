@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Divider,
   Skeleton,
@@ -12,100 +12,43 @@ import {
   Modal,
   Input,
   Form,
-  message,
 } from 'antd';
 import { DeleteTwoTone } from '@ant-design/icons';
 import NavBar from '../Components/NavBar';
-import { BASE_URL } from '../constants';
-import axios from 'axios';
-import { AuthContext } from '../context';
 import CustomCard from '../Components/CustomCard';
 import LogOutButton from '../Components/LogOutButton';
 import CustomBreadcrumb from '../Components/CustomBreadcrumb';
+import { getProfile } from '../network/lib/profile';
+import { addCategory, deleteCategory } from '../network/lib/category';
 function Profile() {
   const [data, setData] = useState(null);
   const [reload, setReload] = useState(false);
-  const { token } = useContext(AuthContext);
   const [form] = Form.useForm();
   useEffect(() => {
-    async function fetchData() {
-      const response = await axios.get(`${BASE_URL}/auth/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setData(response.data);
-    }
-    fetchData();
-  }, [token, reload]);
+    getProfile().then((response)=>setData(response.data));
+  }, [reload]);
 
   const [addCategoryType, setAddCategoryType] = useState('Income');
   const [CategoryModal, setCategoryModal] = useState(false);
-
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [categoryName, setCategoryName] = useState('');
+
   const addCategoryModal = (type) => {
     setAddCategoryType(type);
     setCategoryModal(true);
   };
 
-  const addCategory = async () => {
-    message.info({
-      content: 'Adding Category.. please wait',
-      key: 'loading',
-    });
-    try {
-      setConfirmLoading(true);
-      const res = await axios.post(
-        `${BASE_URL}/money/addCategory`,
-        {
-          type: addCategoryType.toLocaleLowerCase(),
-          name: categoryName,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setConfirmLoading(false);
-      setCategoryModal(false);
-      setReload(!reload);
-      message.destroy('loading');
-      message.success(res?.data?.message, 3);
+  const newCategory = async () => {
+    setConfirmLoading(true);
+    addCategory({
+      type: addCategoryType.toLocaleLowerCase(),
+      name: categoryName,
+    }).finally(function () {
       form.resetFields();
-    } catch (error) {
       setConfirmLoading(false);
       setCategoryModal(false);
-      message.destroy('loading');
-      message.error(error?.response?.data?.message, 3);
-    }
-  };
-
-  const deleteCategory = async (id) => {
-    message.warning({
-      content: 'Deleting Category.. please wait',
-      key: 'loading',
-    });
-    try {
-      const res = await axios.delete(`${BASE_URL}/money/deleteCategory/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
       setReload(!reload);
-      setConfirmLoading(false);
-      message.destroy('loading');
-      message.success(res?.data?.message, 3);
-    } catch (error) {
-      setConfirmLoading(false);
-      message.destroy('loading');
-      message.error(error?.response?.data?.message, 3);
-    }
-  };
-
-  const handleCancel = () => {
-    setCategoryModal(false);
+    });
   };
 
   const CategoryItem = (props) => {
@@ -120,12 +63,10 @@ function Profile() {
         <Popconfirm
           title={`Are you sure to delete-${props.name}`}
           onConfirm={() => {
-            setConfirmLoading(true);
-            deleteCategory(props.id);
+            deleteCategory(props.id).finally(() => setReload(!reload));
           }}
           onCancel={() => true}
           okText='Delete'
-          cancelText='Cancel'
         >
           <DeleteTwoTone twoToneColor='red' />
         </Popconfirm>
@@ -234,9 +175,11 @@ function Profile() {
       <Modal
         title={`Add ${addCategoryType} Category`}
         visible={CategoryModal}
-        onOk={addCategory}
+        onOk={newCategory}
         confirmLoading={confirmLoading}
-        onCancel={handleCancel}
+        onCancel={() => {
+          setCategoryModal(false);
+        }}
       >
         <Form form={form}>
           <Form.Item name='Name'>
